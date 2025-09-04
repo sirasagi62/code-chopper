@@ -23,7 +23,6 @@ const createLanguageLoader =
     try {
       switch (language) {
         case "javascript":
-          return (await import("tree-sitter-javascript")).default;
         case "typescript": {
           const ts = await import("tree-sitter-typescript");
           return ts.typescript;
@@ -73,7 +72,7 @@ export const createParserFactory = (): ParserFactory => {
       return null;
     }
 
-    if (!parsers.has(language)) {
+    if (!parsers.has(language) && loader) {
       const languageModule = await loader(language);
       if (languageModule) {
         const parser = new Parser();

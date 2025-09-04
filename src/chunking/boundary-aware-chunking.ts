@@ -23,6 +23,8 @@ export type BoundaryInfo = {
   type: string;
   level?: number;
   name?: string;
+  parent?: string[];
+  docs?: string;
   title?: string;
 };
 
@@ -31,4 +33,5 @@ export type BoundaryChunk = {
   startOffset: number;
   endOffset: number;
   boundary: BoundaryInfo;
+  filePath?: string;
 };

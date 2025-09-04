@@ -8,6 +8,9 @@
  * Original: https://github.com/ushironoko/gistdex
  */
 
+import type { SyntaxNode } from "tree-sitter";
+import type { CSTBoundary } from "./cst-operations";
+
 // 各言語のノードタイプ定義
 // Tree-sitter各パーサーのドキュメントとnode-types.jsonから抽出
 
@@ -16,7 +19,7 @@ export const LANGUAGE_NODE_TYPES = {
     functions: [
       "function_declaration",
       "function_expression",
-      "arrow_function",
+      //  "arrow_function",
     ],
     classes: ["class_declaration"],
     methods: ["method_definition"],
@@ -27,7 +30,7 @@ export const LANGUAGE_NODE_TYPES = {
     functions: [
       "function_declaration",
       "function_expression",
-      "arrow_function",
+      //  "arrow_function",
     ],
     classes: ["class_declaration"],
     methods: ["method_definition"],
@@ -120,7 +123,7 @@ export const createBoundaryNodeTypes = (language: LanguageEnum): Set<string> => 
 
   if (!langConfig) {
     // デフォルト（JavaScript）を使用
-    const defaultConfig = LANGUAGE_NODE_TYPES.javascript;
+    const defaultConfig = LANGUAGE_NODE_TYPES.typescript;
     Object.values(defaultConfig)
       .flat()
       .forEach((type) => nodeTypes.add(type));
@@ -135,7 +138,7 @@ export const createBoundaryNodeTypes = (language: LanguageEnum): Set<string> => 
 
 // ノード名抽出の言語別実装
 export const createNodeNameExtractor = (language: string) => {
-  return (node: any): string | undefined => {
+  return (node: SyntaxNode): string | undefined => {
     // 共通的な名前フィールドの確認
     const nameField = node.childForFieldName?.("name");
     if (nameField?.text) {
@@ -148,14 +151,24 @@ export const createNodeNameExtractor = (language: string) => {
       case "typescript":
         // Arrow function の場合、親の variable_declarator から名前を取得
         if (node.type === "arrow_function") {
-          const parent = node.parent;
-          if (parent?.type === "variable_declarator") {
-            const idNode = parent.childForFieldName("name");
+          const parent = node.parent
+          if (parent) {
+            const idNode = parent.childForFieldName("name")
+            if (idNode?.text) {
+              return idNode.text
+            }
+          }
+        }
+        if (node.type === "variable_declaration" || node.type === "lexical_declaration") {
+          const child = node.children.find(c=>c.type==="variable_declarator")
+          if (child) {
+            const idNode = child.childForFieldName("name");
             if (idNode?.text) {
               return idNode.text;
             }
           }
         }
+
         // メソッドの場合、key フィールドから名前を取得
         if (node.type === "method_definition") {
           const keyNode = node.childForFieldName("key");
@@ -207,3 +220,95 @@ export const createNodeNameExtractor = (language: string) => {
     return identifierChild?.text;
   };
 };
+
+export type DocsDetail = {
+  hasDocs: true
+  detail: CSTBoundary
+} | { hasDocs: false }
+
+// java,jsなどのdocsを抽出する関数のfactory
+export const createDocsExtracor = (language: LanguageEnum) => {
+  const extractOuterDocComment = (node: SyntaxNode): DocsDetail => {
+    let doc_candidate = node.previousSibling
+    switch (language) {
+      case "javascript":
+      case "typescript":
+        if (node.parent?.type === "export_statement") {
+          doc_candidate = node.parent.previousSibling
+        }
+        break;
+      case "python":
+      case "go":
+      case "rust":
+      case "java":
+      case "ruby":
+      case "c":
+      case "cpp":
+      case "html":
+      case "css":
+      case "bash":
+        break;
+    }
+    if (doc_candidate && doc_candidate.type.includes("comment")) {
+      console.log(doc_candidate)
+      console.log(doc_candidate.startIndex)
+      console.log(doc_candidate.endIndex)
+      console.log(doc_candidate.text)
+
+      return {
+        hasDocs: true,
+        detail: {
+          text: doc_candidate.text + '\n',
+          startIndex: doc_candidate.startIndex,
+          endIndex: doc_candidate.endIndex,
+        }
+      }
+    }
+    return {
+      hasDocs: false
+    }
+
+  }
+
+
+  // pythonのドキュメントを取ってくる関数
+  const extractPyDocComment = (node: SyntaxNode): DocsDetail => {
+
+    const doc_candidate = node.lastChild?.firstChild?.firstChild
+    if (doc_candidate && doc_candidate.type === "string") {
+      return {
+        hasDocs: true,
+        detail: {
+          text: doc_candidate.text,
+          startIndex: doc_candidate.startIndex,
+          endIndex: doc_candidate.endIndex,
+        }
+      }
+    }
+    return {
+      hasDocs: false
+    }
+
+  }
+  return (node: SyntaxNode): DocsDetail => {
+    switch (language) {
+      case "javascript":
+      case "typescript":
+      case "rust":
+      case "java":
+      case "ruby":
+      case "c":
+      case "cpp":
+      case "go":
+        return extractOuterDocComment(node)
+      case "python":
+        return extractPyDocComment(node)
+      case "html":
+      case "css":
+      case "bash":
+        return {
+          hasDocs: false
+        }
+    }
+  }
+}

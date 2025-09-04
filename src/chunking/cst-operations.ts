@@ -7,6 +7,7 @@ import type {
 import { getLanguageFromExtension } from "./file-extensions.js";
 import {
   createBoundaryNodeTypes,
+  createDocsExtracor,
   createNodeNameExtractor,
   type LanguageEnum,
 
@@ -14,42 +15,53 @@ import {
 import type { ParserFactory } from "./parser-factory.js";
 import { createParserFactory } from "./parser-factory.js";
 
-interface CSTBoundary {
-  type: string;
-  name?: string;
+export interface CSTBoundary {
   startIndex: number;
   endIndex: number;
   text: string;
 }
 
+export type CSTBoundaryWithMeta = {
+  type: string;
+  parentInfo: string[];
+  name: string|undefined;
+  docsText: string
+} & CSTBoundary
+
 // ノード走査操作
 const createNodeTraverser = (language: LanguageEnum) => {
   const boundaryNodeTypes = createBoundaryNodeTypes(language);
   const extractName = createNodeNameExtractor(language);
+  const extractDocs = createDocsExtracor(language)
 
   const isBoundary = (nodeType: string): boolean =>
     boundaryNodeTypes.has(nodeType);
 
-  const traverse = (node: SyntaxNode): CSTBoundary[] => {
-    const boundaries: CSTBoundary[] = [];
+  const traverse = (node: SyntaxNode): CSTBoundaryWithMeta[] => {
+    const boundaries: CSTBoundaryWithMeta[] = [];
 
-    const visit = (node: SyntaxNode): void => {
+    const visit = (node: SyntaxNode, parentInfo: string[]): void => {
+      const docs = extractDocs(node)
+      const name = extractName(node)
       if (isBoundary(node.type)) {
         boundaries.push({
           type: node.type,
-          name: extractName(node),
-          startIndex: node.startIndex,
+          parentInfo,
+          name,
+          startIndex: docs.hasDocs ? docs.detail.startIndex : node.startIndex,
           endIndex: node.endIndex,
           text: node.text,
-        });
+          docsText: docs.hasDocs ? docs.detail.text : ""
+        })
+        parentInfo = name ? [...parentInfo,name] : parentInfo
       }
 
       for (const child of node.children) {
-        visit(child);
+        visit(child, parentInfo);
       }
     };
 
-    visit(node);
+    visit(node, []);
     return boundaries;
   };
 
@@ -61,7 +73,7 @@ const createCSTOperations = (factory: ParserFactory) => {
   const parseAndExtractBoundaries = async (
     code: string,
     language: LanguageEnum,
-  ): Promise<CSTBoundary[]> => {
+  ): Promise<CSTBoundaryWithMeta[]> => {
     const parser = await factory.createParser(language);
     if (!parser) {
       throw new Error(`No parser available for language: ${language}`);
@@ -72,7 +84,7 @@ const createCSTOperations = (factory: ParserFactory) => {
     return traverser.traverse(tree.rootNode);
   };
 
-  const boundariesToChunks = (boundaries: CSTBoundary[]): BoundaryChunk[] => {
+  const boundariesToChunks = (boundaries: CSTBoundaryWithMeta[]): BoundaryChunk[] => {
     return boundaries.map((boundary) => ({
       content: boundary.text,
       startOffset: boundary.startIndex,
@@ -80,6 +92,8 @@ const createCSTOperations = (factory: ParserFactory) => {
       boundary: {
         type: boundary.type,
         name: boundary.name,
+        parent: boundary.parentInfo,
+        docs: boundary.docsText
       },
     }));
   };

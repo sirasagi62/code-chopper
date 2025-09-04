@@ -1,61 +1,74 @@
-import fs from "node:fs/promises";
+import fs from "node:fs/promises"; // Changed to sync fs
 import path from "node:path";
 import { getLanguageFromExtension } from "../chunking/file-extensions.js";
 import type { ParserFactory } from "../chunking/parser-factory.js";
 import type { BoundaryChunk } from "../chunking/boundary-aware-chunking.js";
 import { createCSTChunkingOperations } from "../chunking/cst-operations.js";
+import type { SyntaxNode } from "tree-sitter";
+
+type Options = {
+  filter: (node: SyntaxNode) => boolean
+}
 
 /**
  * Reads a file, determines its language from the extension, and parses it into chunks.
- * @param filePath The path to the file to read and parse.
+ * @param relativeFilePath The path to the file to read and parse.
  * @param factory The ParserFactory to create parsers.
  * @param options Options for chunking.
  * @returns A promise that resolves to an array of BoundaryChunk.
  */
 export const readFileAndChunk = async (
-  filePath: string,
   factory: ParserFactory,
   options: { maxChunkSize: number; overlap: number },
+  baseDirPath: string,
+  relativeFilePath: string,
 ): Promise<BoundaryChunk[]> => {
-  const code = await fs.readFile(filePath, "utf-8");
-  const ext = path.extname(filePath);
+  const code = await fs.readFile(path.join(baseDirPath, relativeFilePath), 'utf8');
+  const ext = path.extname(relativeFilePath);
   const language = getLanguageFromExtension(ext);
 
   if (!language) {
     throw new Error(`Unsupported file extension: ${ext}`);
   }
 
-  const cstOperations = createCSTChunkingOperations();
-  return cstOperations.chunkWithCST(code, language, options, factory);
+  // Use parseCodeAndChunk instead of direct CST operations
+  const chunks = await parseCodeAndChunk(code.toString(), language, factory, options);
+  return chunks.map(c => ({
+    ...c,
+    filePath: relativeFilePath
+  }))
 };
 
 /**
  * Recursively reads all files in a directory and its subdirectories,
  * parsing each supported file into chunks.
- * @param directoryPath The path to the directory to scan.
+ * @param baseDirPath The path to the directory to scan.
  * @param factory The ParserFactory to create parsers.
  * @param options Options for chunking.
  * @returns A promise that resolves to an array of BoundaryChunk from all parsed files.
  */
 export const readDirectoryAndChunk = async (
-  directoryPath: string,
   factory: ParserFactory,
   options: { maxChunkSize: number; overlap: number },
+  baseDirPath: string,
+  relativePath?: string,
 ): Promise<BoundaryChunk[]> => {
   let allChunks: BoundaryChunk[] = [];
-  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
 
+  relativePath = relativePath ?? ""
+  const entries = await fs.readdir(path.join(baseDirPath, relativePath), { withFileTypes: true });
   for (const entry of entries) {
-    const fullPath = path.join(directoryPath, entry.name);
+    const relativeDirPath = path.join(relativePath, entry.name).toString();
     if (entry.isDirectory()) {
-      const dirChunks = await readDirectoryAndChunk(fullPath, factory, options);
+      const dirChunks = await readDirectoryAndChunk(factory, options, baseDirPath, relativeDirPath);
       allChunks = allChunks.concat(dirChunks);
-    } else if (/\.(ts|js|tsx|jsx|py|java|cpp|c|h|cs|go|rb|php)$/.test(entry.name)) { // Example supported extensions
+    } else if (/\.(ts|js|tsx|jsx|py|java|cpp|c|h|cs|go|rb|php|go)$/.test(entry.name)) { // Added go
       try {
-        const fileChunks = await readFileAndChunk(fullPath, factory, options);
+        // Use readFileAndChunk which now uses parseCodeAndChunk
+        const fileChunks = await readFileAndChunk(factory, options, baseDirPath, relativeDirPath);
         allChunks = allChunks.concat(fileChunks);
       } catch (error) {
-        console.warn(`Failed to chunk file ${fullPath}:`, error);
+        console.warn(`Failed to chunk file ${relativeDirPath}:`, error);
       }
     }
   }
@@ -70,7 +83,7 @@ export const readDirectoryAndChunk = async (
  * @param options Options for chunking.
  * @returns A promise that resolves to an array of BoundaryChunk.
  */
-export const parseCodeAndChunk = async (
+export const parseCodeAndChunk = (
   code: string,
   language: string,
   factory: ParserFactory,
