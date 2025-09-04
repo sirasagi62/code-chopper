@@ -14,21 +14,21 @@
  * Boundary-aware chunking for maintaining semantic boundaries in content
  */
 
-export interface BoundaryChunkOptions {
+export type BoundaryChunkOptions = {
   maxChunkSize: number;
   overlap: number;
-}
+};
 
-export interface BoundaryInfo {
+export type BoundaryInfo = {
   type: string;
   level?: number;
   name?: string;
   title?: string;
-}
+};
 
-export interface BoundaryChunk {
+export type BoundaryChunk = {
   content: string;
   startOffset: number;
   endOffset: number;
   boundary: BoundaryInfo;
-}
+};

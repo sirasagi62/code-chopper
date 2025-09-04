@@ -8,11 +8,12 @@ To create a library that semantically splits code into meaningful chunks using t
 
 ## Current State
 The `src` directory contains the following modules:
-*   `boundary-aware-chunking.ts`: Likely handles the logic for identifying chunk boundaries.
-*   `cst-operations.ts`: Probably contains utility functions for manipulating the Concrete Syntax Tree (CST) or AST.
-*   `file-extensions.ts`: May map file extensions to their corresponding tree-sitter parsers.
-*   `language-node-types.ts`: Likely defines the specific node types relevant for different programming languages within the AST.
-*   `parser-factory.ts`: Responsible for creating tree-sitter parsers based on language.
+*   `chunking/boundary-aware-chunking.ts`: Handles the logic for identifying chunk boundaries.
+*   `chunking/cst-operations.ts`: Contains utility functions for manipulating the Concrete Syntax Tree (CST) or AST.
+*   `chunking/file-extensions.ts`: Maps file extensions to their corresponding tree-sitter parsers and language identifiers.
+*   `chunking/language-node-types.ts`: Defines the specific AST node types relevant for different programming languages.
+*   `chunking/parser-factory.ts`: Responsible for creating tree-sitter parsers based on language.
+*   `io/file-operations.ts`: (New) Will contain functions for reading and parsing files.
 
 ## Development Plan
 
@@ -24,7 +25,7 @@ The `src` directory contains the following modules:
     *   Develop logic to traverse the AST and group related nodes into chunks.
     *   Consider how to handle different programming language syntaxes and their specific AST structures.
 3.  **Implement Boundary Awareness**: Refine chunking to be "boundary-aware," meaning chunks should respect logical code boundaries (e.g., not splitting a function definition across two chunks).
-4.  **Add Support for More Languages**: Expand `file-extensions.ts` and `language-node-types.ts` to support a wider range of programming languages. This will involve identifying the correct tree-sitter parsers for each language.
+4.  **Add Support for More Languages**: Expand `chunking/file-extensions.ts` and `chunking/language-node-types.ts` to support a wider range of programming languages. This will involve identifying the correct tree-sitter parsers for each language.
 5.  **Testing**:
     *   Write unit tests for each module in `src`.
     *   Develop integration tests that parse various code snippets and verify the generated chunks.
