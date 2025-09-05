@@ -1,13 +1,14 @@
 import fs from "node:fs/promises"; // Changed to sync fs
 import path from "node:path";
-import { getLanguageFromExtension } from "../chunking/file-extensions.js";
-import type { ParserFactory } from "../chunking/parser-factory.js";
-import type { BoundaryChunk } from "../chunking/boundary-aware-chunking.js";
-import { createCSTChunkingOperations } from "../chunking/cst-operations.js";
+import { getLanguageFromExtension } from "../chunking/file-extensions.ts";
+import type { ParserFactory } from "../chunking/parser-factory.ts";
+import type { BoundaryChunk } from "../chunking/boundary-aware-chunking.ts";
+import { createCSTChunkingOperations } from "../chunking/cst-operations.ts";
 import type { SyntaxNode } from "tree-sitter";
+import type { LanguageEnum } from "../chunking/language-node-types.ts";
 
-type Options = {
-  filter: (node: SyntaxNode) => boolean
+export type Options = {
+  filter: (language: LanguageEnum, node: SyntaxNode) => boolean
 }
 
 /**
@@ -19,7 +20,7 @@ type Options = {
  */
 export const readFileAndChunk = async (
   factory: ParserFactory,
-  options: { maxChunkSize: number; overlap: number },
+  options: Options,
   baseDirPath: string,
   relativeFilePath: string,
 ): Promise<BoundaryChunk[]> => {
@@ -49,7 +50,7 @@ export const readFileAndChunk = async (
  */
 export const readDirectoryAndChunk = async (
   factory: ParserFactory,
-  options: { maxChunkSize: number; overlap: number },
+  options: Options,
   baseDirPath: string,
   relativePath?: string,
 ): Promise<BoundaryChunk[]> => {
@@ -87,7 +88,7 @@ export const parseCodeAndChunk = (
   code: string,
   language: string,
   factory: ParserFactory,
-  options: { maxChunkSize: number; overlap: number },
+  options: Options,
 ): Promise<BoundaryChunk[]> => {
   const cstOperations = createCSTChunkingOperations();
   // Ensure language is a valid LanguageEnum if necessary, or handle string directly

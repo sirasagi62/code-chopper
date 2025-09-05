@@ -37,7 +37,7 @@ export const LANGUAGE_NODE_TYPES = {
     interfaces: ["interface_declaration"],
     types: ["type_alias_declaration"],
     imports: ["import_statement"],
-    variables: ["variable_declaration", "lexical_declaration"],
+    variables: ["variable_declaration", "lexical_declaration","public_field_definition"],
   },
   python: {
     functions: ["function_definition"],
@@ -52,8 +52,8 @@ export const LANGUAGE_NODE_TYPES = {
     types: ["type_declaration"],
     imports: ["import_declaration"],
     variables: [
-      "var_declaration",
-      "const_declaration",
+      "var_spec",
+      "const_spec",
       "short_var_declaration",
     ],
   },
@@ -160,7 +160,7 @@ export const createNodeNameExtractor = (language: string) => {
           }
         }
         if (node.type === "variable_declaration" || node.type === "lexical_declaration") {
-          const child = node.children.find(c=>c.type==="variable_declarator")
+          const child = node.children.find(c => c.type === "variable_declarator")
           if (child) {
             const idNode = child.childForFieldName("name");
             if (idNode?.text) {
@@ -188,6 +188,19 @@ export const createNodeNameExtractor = (language: string) => {
           const nameNode = node.childForFieldName("name");
           if (nameNode?.text) {
             return nameNode.text;
+          }
+        }
+        let target = node;
+        while (target.children.length > 0) {
+          const nameCandidate = target.children.filter(c => c.type === "identifier")
+          if (nameCandidate.length < 1) {
+            if(target.firstChild) {
+              target = target.firstChild
+            } else {
+              break
+            }
+          } else {
+            return nameCandidate.at(0)?.text
           }
         }
         break;
@@ -250,15 +263,10 @@ export const createDocsExtracor = (language: LanguageEnum) => {
         break;
     }
     if (doc_candidate && doc_candidate.type.includes("comment")) {
-      console.log(doc_candidate)
-      console.log(doc_candidate.startIndex)
-      console.log(doc_candidate.endIndex)
-      console.log(doc_candidate.text)
-
       return {
         hasDocs: true,
         detail: {
-          text: doc_candidate.text + '\n',
+          text: doc_candidate.text,
           startIndex: doc_candidate.startIndex,
           endIndex: doc_candidate.endIndex,
         }

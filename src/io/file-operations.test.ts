@@ -28,7 +28,8 @@ describe("file-operations", () => {
       await writeFile(filePath, fileContent);
 
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await readFileAndChunk(factory, options, tempDir, "test.js");
 
       expect(chunks.length).toBeGreaterThan(0);
@@ -42,7 +43,8 @@ describe("file-operations", () => {
       await writeFile(filePath, "This is a text file.");
 
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
 
       expect(readFileAndChunk(factory, options, tempDir, "test.txt")).rejects.toThrow(
         "Unsupported file extension: .txt"
@@ -69,7 +71,8 @@ describe("file-operations", () => {
       `;
       const language = "typescript";
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
       console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
@@ -98,11 +101,90 @@ def add(a: int, b: int) -> int:
     return result`;
       const language = "python";
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
       console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("def add"))).toBe(true);
+
+      factory.dispose();
+    });
+
+    it("should parse code and chunk it (golang)", async () => {
+      const code = `
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, Golang!")
+}
+      `;
+      const language = "go";
+      const factory = createParserFactory();
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
+      const chunks = await parseCodeAndChunk(code, language, factory, options);
+      console.log("Chunk:\n", JSON.stringify(chunks))
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.some(chunk => chunk.content.includes("func main"))).toBe(true);
+
+      factory.dispose();
+    });
+
+    it("should parse code and chunk it (c++)", async () => {
+      const code = `
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, C++!" << std::endl;
+    return 0;
+}
+      `;
+      const language = "cpp";
+      const factory = createParserFactory();
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
+      const chunks = await parseCodeAndChunk(code, language, factory, options);
+      console.log("Chunk:\n", JSON.stringify(chunks))
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.some(chunk => chunk.content.includes("int main"))).toBe(true);
+
+      factory.dispose();
+    });
+
+    it("should parse code and chunk it (java)", async () => {
+      const code = `
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+    }
+}
+      `;
+      const language = "java";
+      const factory = createParserFactory();
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
+      const chunks = await parseCodeAndChunk(code, language, factory, options);
+      console.log("Chunk:\n", JSON.stringify(chunks))
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.some(chunk => chunk.content.includes("public class HelloWorld"))).toBe(true);
+
+      factory.dispose();
+    });
+
+    it("should parse code and chunk it (ruby)", async () => {
+      const code = `
+def greet
+  puts "Hello, Ruby!"
+end
+greet
+      `;
+      const language = "ruby";
+      const factory = createParserFactory();
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
+      const chunks = await parseCodeAndChunk(code, language, factory, options);
+      console.log("Chunk:\n", JSON.stringify(chunks))
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.some(chunk => chunk.content.includes("def greet"))).toBe(true);
 
       factory.dispose();
     });
@@ -123,7 +205,8 @@ def hi():
       await writeFile(join(subDir, "file4.py"), pycode);
 
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await readDirectoryAndChunk(factory, options, tempDir);
 
       expect(chunks.length).toBeGreaterThan(0);
@@ -137,7 +220,8 @@ def hi():
 
     it("should handle empty directories", async () => {
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await readDirectoryAndChunk(factory, options, tempDir);
 
       expect(chunks).toEqual([]);
@@ -149,7 +233,8 @@ def hi():
       await writeFile(join(tempDir, "unsupported.dat"), "binary data");
 
       const factory = createParserFactory();
-      const options = { maxChunkSize: 100, overlap: 10 };
+      // Provide a filter function to satisfy the Options type
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await readDirectoryAndChunk(factory, options, tempDir);
 
       expect(chunks).toEqual([]);

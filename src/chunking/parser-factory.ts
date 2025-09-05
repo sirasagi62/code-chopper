@@ -14,46 +14,47 @@ import Parser from "tree-sitter";
 import {
   type SupportedLanguage,
   isSupportedLanguage,
-} from "./file-extensions.js";
+} from "./file-extensions.ts";
+import { exit } from "node:process";
 
 // 言語モジュールローダー
 const createLanguageLoader =
   () =>
-  async (language: SupportedLanguage): Promise<any> => {
-    try {
-      switch (language) {
-        case "javascript":
-        case "typescript": {
-          const ts = await import("tree-sitter-typescript");
-          return ts.typescript;
+    async (language: SupportedLanguage): Promise<any> => {
+      try {
+        switch (language) {
+          case "javascript":
+          case "typescript":
+            const ts = await import("tree-sitter-typescript");
+            return ts.typescript ?? ts.default?.typescript ?? ts.default;
+          case "python":
+            return (await import("tree-sitter-python")).default;
+          case "go":
+            return (await import("tree-sitter-go")).default;
+          case "rust":
+            return (await import("tree-sitter-rust")).default;
+          case "java":
+            return (await import("tree-sitter-java")).default;
+          case "ruby":
+            return (await import("tree-sitter-ruby")).default;
+          case "c":
+            return (await import("tree-sitter-c")).default;
+          case "cpp":
+            return (await import("tree-sitter-cpp")).default;
+          case "html":
+            return (await import("tree-sitter-html")).default;
+          case "css":
+            return (await import("tree-sitter-css")).default;
+          case "bash":
+            return (await import("tree-sitter-bash")).default;
+          default:
+            return null;
         }
-        case "python":
-          return (await import("tree-sitter-python")).default;
-        case "go":
-          return (await import("tree-sitter-go")).default;
-        case "rust":
-          return (await import("tree-sitter-rust")).default;
-        case "java":
-          return (await import("tree-sitter-java")).default;
-        case "ruby":
-          return (await import("tree-sitter-ruby")).default;
-        case "c":
-          return (await import("tree-sitter-c")).default;
-        case "cpp":
-          return (await import("tree-sitter-cpp")).default;
-        case "html":
-          return (await import("tree-sitter-html")).default;
-        case "css":
-          return (await import("tree-sitter-css")).default;
-        case "bash":
-          return (await import("tree-sitter-bash")).default;
-        default:
-          return null;
+      } catch {
+        console.log("Failed to load language module for ",language)
+        return null;
       }
-    } catch {
-      return null;
-    }
-  };
+    };
 
 // パーサーファクトリーのインターフェース
 export interface ParserFactory {
@@ -69,6 +70,7 @@ export const createParserFactory = (): ParserFactory => {
   const createParser = async (language: string): Promise<Parser | null> => {
     // 型ガードで安全にSupportedLanguageかチェック
     if (!isSupportedLanguage(language)) {
+      console.warn(`${language} is not supported.`)
       return null;
     }
 
@@ -76,8 +78,13 @@ export const createParserFactory = (): ParserFactory => {
       const languageModule = await loader(language);
       if (languageModule) {
         const parser = new Parser();
-        parser.setLanguage(languageModule);
-        parsers.set(language, parser);
+        try {
+          parser.setLanguage(languageModule);
+          parsers.set(language, parser);
+        } catch (e) {
+          console.log("Loading Module:",languageModule.name)
+          exit()
+        }
       }
     }
     return parsers.get(language) || null;

@@ -3,17 +3,18 @@ import type { SyntaxNode } from "tree-sitter";
 import type {
   BoundaryChunk,
   BoundaryChunkOptions,
-} from "./boundary-aware-chunking.js";
-import { getLanguageFromExtension } from "./file-extensions.js";
+} from "./boundary-aware-chunking.ts";
+import { getLanguageFromExtension } from "./file-extensions.ts";
 import {
   createBoundaryNodeTypes,
   createDocsExtracor,
   createNodeNameExtractor,
   type LanguageEnum,
 
-} from "./language-node-types.js";
-import type { ParserFactory } from "./parser-factory.js";
-import { createParserFactory } from "./parser-factory.js";
+} from "./language-node-types.ts";
+import type { ParserFactory } from "./parser-factory.ts";
+import { createParserFactory } from "./parser-factory.ts";
+import type { Options } from "../io/file-operations.ts";
 
 export interface CSTBoundary {
   startIndex: number;
@@ -37,13 +38,13 @@ const createNodeTraverser = (language: LanguageEnum) => {
   const isBoundary = (nodeType: string): boolean =>
     boundaryNodeTypes.has(nodeType);
 
-  const traverse = (node: SyntaxNode): CSTBoundaryWithMeta[] => {
+  const traverse = (node: SyntaxNode,filter: (l: LanguageEnum,s: SyntaxNode)=>boolean): CSTBoundaryWithMeta[] => {
     const boundaries: CSTBoundaryWithMeta[] = [];
 
     const visit = (node: SyntaxNode, parentInfo: string[]): void => {
       const docs = extractDocs(node)
       const name = extractName(node)
-      if (isBoundary(node.type)) {
+      if (isBoundary(node.type) && filter(language,node)) {
         boundaries.push({
           type: node.type,
           parentInfo,
@@ -73,6 +74,7 @@ const createCSTOperations = (factory: ParserFactory) => {
   const parseAndExtractBoundaries = async (
     code: string,
     language: LanguageEnum,
+    options: Options,
   ): Promise<CSTBoundaryWithMeta[]> => {
     const parser = await factory.createParser(language);
     if (!parser) {
@@ -81,7 +83,7 @@ const createCSTOperations = (factory: ParserFactory) => {
 
     const traverser = createNodeTraverser(language);
     const tree = parser.parse(code);
-    return traverser.traverse(tree.rootNode);
+    return traverser.traverse(tree.rootNode,options.filter);
   };
 
   const boundariesToChunks = (boundaries: CSTBoundaryWithMeta[]): BoundaryChunk[] => {
@@ -122,11 +124,11 @@ export const createCSTChunkingOperations = () => {
   const chunkWithCST = async (
     code: string,
     language: LanguageEnum,
-    _options: BoundaryChunkOptions,
+    _options: Options,
     factory: ParserFactory,
   ): Promise<BoundaryChunk[]> => {
     return withCSTParsing(factory, async (ops) => {
-      const boundaries = await ops.parseAndExtractBoundaries(code, language);
+      const boundaries = await ops.parseAndExtractBoundaries(code, language,_options);
       return ops.boundariesToChunks(boundaries);
     });
   };
@@ -134,11 +136,11 @@ export const createCSTChunkingOperations = () => {
   const chunkWithFallback = async (
     code: string,
     filePath: string,
-    options: BoundaryChunkOptions,
+    options: Options,
     fallback: (
       code: string,
       lang: string,
-      opts: BoundaryChunkOptions,
+      opts: Options,
     ) => BoundaryChunk[],
   ): Promise<BoundaryChunk[]> => {
     const ext = path.extname(filePath);
