@@ -17,7 +17,7 @@ import {
 } from "./file-extensions.ts";
 import { exit } from "node:process";
 
-// 言語モジュールローダー
+// Language module loader
 const createLanguageLoader =
   () =>
     async (language: SupportedLanguage): Promise<any> => {
@@ -56,19 +56,19 @@ const createLanguageLoader =
       }
     };
 
-// パーサーファクトリーのインターフェース
+// Parser factory interface
 export interface ParserFactory {
   createParser: (language: string) => Promise<Parser | null>;
   dispose: () => void;
 }
 
-// パーサーファクトリー関数
+// Parser factory function
 export const createParserFactory = (): ParserFactory => {
   const parsers = new Map<string, Parser>();
   const loader = createLanguageLoader();
 
   const createParser = async (language: string): Promise<Parser | null> => {
-    // 型ガードで安全にSupportedLanguageかチェック
+    // Safely check if it's a SupportedLanguage using a type guard
     if (!isSupportedLanguage(language)) {
       console.warn(`${language} is not supported.`)
       return null;

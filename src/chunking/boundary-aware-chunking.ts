@@ -11,7 +11,7 @@
 
 
 /**
- * Boundary-aware chunking for maintaining semantic boundaries in content
+ * Boundary-aware chunking for maintaining semantic boundaries in content.
  */
 
 export type BoundaryChunkOptions = {

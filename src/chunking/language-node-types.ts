@@ -11,8 +11,8 @@
 import type { SyntaxNode } from "tree-sitter";
 import type { CSTBoundary } from "./cst-operations";
 
-// 各言語のノードタイプ定義
-// Tree-sitter各パーサーのドキュメントとnode-types.jsonから抽出
+// Node type definitions for each language
+// Extracted from tree-sitter parser documentation and node-types.json
 
 export const LANGUAGE_NODE_TYPES = {
   javascript: {
@@ -42,9 +42,9 @@ export const LANGUAGE_NODE_TYPES = {
   python: {
     functions: ["function_definition"],
     classes: ["class_definition"],
-    methods: ["function_definition"], // クラス内のメソッドも function_definition
+    methods: ["function_definition"], // Methods within classes are also function_definition
     imports: ["import_statement", "import_from_statement"],
-    variables: ["assignment"], // Pythonの変数代入
+    variables: ["assignment"], // Variable assignment in Python
   },
   go: {
     functions: ["function_declaration"],
@@ -115,14 +115,14 @@ export const LANGUAGE_NODE_TYPES = {
 } as const;
 
 export type LanguageEnum = keyof typeof LANGUAGE_NODE_TYPES
-// すべての境界ノードタイプを収集
+// Collect all boundary node types
 export const createBoundaryNodeTypes = (language: LanguageEnum): Set<string> => {
   const nodeTypes = new Set<string>();
   const langConfig =
     LANGUAGE_NODE_TYPES[language];
 
   if (!langConfig) {
-    // デフォルト（JavaScript）を使用
+    // Use default (JavaScript) if language config is not found
     const defaultConfig = LANGUAGE_NODE_TYPES.typescript;
     Object.values(defaultConfig)
       .flat()
@@ -136,20 +136,20 @@ export const createBoundaryNodeTypes = (language: LanguageEnum): Set<string> => 
   return nodeTypes;
 };
 
-// ノード名抽出の言語別実装
+// Language-specific node name extraction implementation
 export const createNodeNameExtractor = (language: string) => {
   return (node: SyntaxNode): string | undefined => {
-    // 共通的な名前フィールドの確認
+    // Check for common 'name' field first
     const nameField = node.childForFieldName?.("name");
     if (nameField?.text) {
       return nameField.text;
     }
 
-    // 言語固有の処理
+    // Language-specific processing
     switch (language) {
       case "javascript":
       case "typescript":
-        // Arrow function の場合、親の variable_declarator から名前を取得
+        // For Arrow functions, get the name from the parent variable_declarator
         if (node.type === "arrow_function") {
           const parent = node.parent
           if (parent) {
@@ -169,7 +169,7 @@ export const createNodeNameExtractor = (language: string) => {
           }
         }
 
-        // メソッドの場合、key フィールドから名前を取得
+        // For methods, get the name from the 'key' field
         if (node.type === "method_definition") {
           const keyNode = node.childForFieldName("key");
           if (keyNode?.text) {
@@ -179,11 +179,11 @@ export const createNodeNameExtractor = (language: string) => {
         break;
 
       case "python":
-        // Python の場合、name フィールドがほとんどの場合で使われる
+        // In Python, the 'name' field is used in most cases
         break;
 
       case "go":
-        // Go の method_declaration の場合
+        // For Go's method_declaration
         if (node.type === "method_declaration") {
           const nameNode = node.childForFieldName("name");
           if (nameNode?.text) {
@@ -206,7 +206,7 @@ export const createNodeNameExtractor = (language: string) => {
         break;
 
       case "rust":
-        // Rust の function_item の場合
+        // For Rust's function_item
         if (node.type === "function_item") {
           const nameNode = node.childForFieldName("name");
           if (nameNode?.text) {
@@ -216,7 +216,7 @@ export const createNodeNameExtractor = (language: string) => {
         break;
 
       case "java":
-        // Java の method_declaration の場合
+        // For Java's method_declaration
         if (node.type === "method_declaration") {
           const nameNode = node.childForFieldName("name");
           if (nameNode?.text) {
@@ -226,7 +226,7 @@ export const createNodeNameExtractor = (language: string) => {
         break;
     }
 
-    // フォールバック: identifier ノードを探す
+    // Fallback: look for an 'identifier' node
     const identifierChild = node.children?.find?.(
       (child: any) => child.type === "identifier",
     );
@@ -239,7 +239,7 @@ export type DocsDetail = {
   detail: CSTBoundary
 } | { hasDocs: false }
 
-// java,jsなどのdocsを抽出する関数のfactory
+// Factory function for extracting documentation comments (e.g., in Java, JS)
 export const createDocsExtracor = (language: LanguageEnum) => {
   const extractOuterDocComment = (node: SyntaxNode): DocsDetail => {
     let doc_candidate = node.previousSibling
@@ -279,7 +279,7 @@ export const createDocsExtracor = (language: LanguageEnum) => {
   }
 
 
-  // pythonのドキュメントを取ってくる関数
+  // Function to extract Python docstrings
   const extractPyDocComment = (node: SyntaxNode): DocsDetail => {
 
     const doc_candidate = node.lastChild?.firstChild?.firstChild
