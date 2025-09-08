@@ -138,7 +138,7 @@ Returns a `Promise` that resolves to an array of `BoundaryChunk`.
 Configuration options for chunking.
 
 *   `filter`: A function `(language: LanguageEnum, node: SyntaxNode) => boolean` that determines whether a node should be included in the chunks.
-*   `excludeDirs?`: An optional array of regular expressions to exclude directories.
+*   `excludeDirs?`: An optional RegExp array of regular expressions to exclude directories. e.g. `[/node_modules/,/\.git/]`
 
 ### `BoundaryInfo`
 
