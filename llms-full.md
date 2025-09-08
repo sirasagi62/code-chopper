@@ -4,15 +4,28 @@ CodeChopper is a TypeScript library that parses and splits source code of variou
 
 > [!TIP]
 > [DeepWiki](https://deepwiki.com/sirasagi62) is available. For [detailed information about the API](https://deepwiki.com/sirasagi62/code-chopper/4-api-reference), please refer to DeepWiki.
+>
+> [llms-full.md](/llms-full.md) is also available. You can provide an overview of code-chopper to the AI coding tool using the following URL:
+>
+> `https://raw.githubusercontent.com/sirasagi62/code-chopper/refs/heads/main/llms-full.md`
 
 ## Main Features
 
-* **Multi-language Support**: Supports parsing of various languages including TypeScript, JavaScript, Python, Ruby, Java, and C++. 
-* **Semantic Splitting**: Instead of simple line-by-line splitting, it uses tree-sitter to split the code based on the Concrete Syntax Tree (CST), identifying functions, classes, methods, and variable declarations. 
+* **Multi-language Support**: Supports parsing of various languages including TypeScript, JavaScript, Python, Ruby, Java, and C++.
+* **Semantic Splitting**: Instead of simple line-by-line splitting, it uses tree-sitter to split the code based on the Concrete Syntax Tree (CST), identifying functions, classes, methods, and variable declarations.
 * **Flexible Configuration**: You can customize the splitting granularity and extract only specific types of code blocks.
 
 ### Supported languages
-typescript,javascript,python,c,c++,ruby,rust,golang,java,bash
+- typescript
+- javascript
+- python
+- c
+- c++
+- ruby
+- rust
+- golang
+- java
+- bash
 
 -----
 
@@ -183,11 +196,18 @@ Represents detailed documentation information.
 *   `hasDocs`: A boolean indicating if documentation is present.
 *   `detail`: A `CSTBoundary` object containing the documentation details.
 
------
+----
+## License
 
+This library is released under the **MIT License**. The full license text can be found in the [LICENSE](./LICENSE) file.
+
+## Acknowledgments
+
+This project partially utilizes code from [ushironoko/gistdex](https://github.com/ushironoko/gistdex).
+----
 # Example Code
 This is a basic example code for CodeChopper. This example extracts the definitions of functions, variables, classes, etc. across the entire project, in a format similar to Aider's repomap or ctags.
-```typescript
+```typecript
 import { createParserFactory, readDirectoryAndChunk, type Options } from "code-chopper";
 import path from "path";
 import fs from "fs";
