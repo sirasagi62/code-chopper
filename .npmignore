@@ -3,3 +3,5 @@
 tsconfig.json
 .aider*
 /.llm
+llms-full.md
+build-llms-full.md.sh
