@@ -207,7 +207,7 @@ This project partially utilizes code from [ushironoko/gistdex](https://github.co
 ----
 # Example Code
 This is a basic example code for CodeChopper. This example extracts the definitions of functions, variables, classes, etc. across the entire project, in a format similar to Aider's repomap or ctags.
-```typecript
+```typescript
 import { createParserFactory, readDirectoryAndChunk, type Options } from "code-chopper";
 import path from "path";
 import fs from "fs";
