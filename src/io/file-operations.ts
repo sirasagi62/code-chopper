@@ -9,6 +9,7 @@ import type { LanguageEnum } from "../chunking/language-node-types.ts";
 
 export type Options = {
   filter: (language: LanguageEnum, node: SyntaxNode) => boolean
+  excludeDirs?: RegExp[]
 }
 
 const isSupportedLanguageExtension = (filename: string) => /\.(ts|js|tsx|jsx|py|java|cpp|c|h|cs|go|rb|php|go)/.test(filename)
@@ -34,7 +35,6 @@ export const readFileAndChunk = async (
   if (!language) {
     // If the language is not supported, we cannot chunk the file.
     // Consider logging this or returning an empty array depending on desired behavior.
-    //throw new Error(`Unsupported file extension: ${ext} for file ${relativeFilePath}`);
     return []
   }
 
@@ -59,7 +59,7 @@ export const readDirectoryAndChunk = async (
   factory: ParserFactory,
   options: Options,
   baseDirPath: string,
-): Promise<BoundaryChunk[]> => _readDirectoryAndChunkRecursive(factory,options,baseDirPath,"")
+): Promise<BoundaryChunk[]> => _readDirectoryAndChunkRecursive(factory, options, baseDirPath, "")
 
 const _readDirectoryAndChunkRecursive = async (
   factory: ParserFactory,
@@ -70,11 +70,12 @@ const _readDirectoryAndChunkRecursive = async (
   const currentPath = path.join(baseDirPath, relativePath);
   const entries = await fs.readdir(currentPath, { withFileTypes: true });
 
+  const excludeDirs = options.excludeDirs ?? [/node_modules/, /^\.[A-Za-z0-9_-]+$/]
   // Convert each entry into a Promise and process them in parallel.
   const promises = entries.map((entry) => {
     const newRelativePath = path.join(relativePath, entry.name);
-
-    if (entry.isDirectory()) {
+    // Check if entry is not excluded directories
+    if (entry.isDirectory() && excludeDirs.every(e=>!e.test(entry.name))) {
       // Return the subdirectories recursively.
       return _readDirectoryAndChunkRecursive(factory, options, baseDirPath, newRelativePath);
     }
