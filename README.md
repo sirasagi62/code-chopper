@@ -20,6 +20,15 @@ npm install code-chopper
 bun add code-chopper
 ```
 
+**You need to execute postinstall script to install tree-sitter dependencies.**
+
+```bash
+## Check postinstalls
+bun pm untrusted
+
+## To execute postinstalls
+bun pm trust --a
+```
 -----
 
 
@@ -32,7 +41,7 @@ For more advanced usage and examples, please see the following repository:
 ----
 ## License
 
-This library is released under the **MIT License**. The full license text can be found in the LICENSE.md file.
+This library is released under the **MIT License**. The full license text can be found in the [LICENSE](./LICENSE) file.
 
 ## Acknowledgments
 

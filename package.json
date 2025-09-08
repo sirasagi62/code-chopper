@@ -20,7 +20,8 @@
   "types":"./dist/index.d.ts",
   "scripts": {
     "test": "test",
-    "build": "tsup src/index.ts --format cjs,esm --dts"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "parepare": "npm run build"
   },
   "dependencies": {
     "bun-types": "^1.2.21",
