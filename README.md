@@ -8,6 +8,9 @@ CodeChopper is a TypeScript library that parses and splits source code of variou
 * **Semantic Splitting**: Instead of simple line-by-line splitting, it uses tree-sitter to split the code based on the Concrete Syntax Tree (CST), identifying functions, classes, methods, and variable declarations. 
 * **Flexible Configuration**: You can customize the splitting granularity and extract only specific types of code blocks.
 
+### Supported languages
+typescript,javascript,python,c,c++,ruby,rust,golang,java,bash
+
 -----
 
 ## Installation
