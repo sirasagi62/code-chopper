@@ -1,6 +1,6 @@
 # CodeChopper
 
-CodeChopper is a TypeScript library that parses and splits source code of various programming languages into semantic units such as functions and classes, using syntax analysis. It allows efficient extraction of specific code blocks, automatic documentation generation, and code summarization when working with large codebases.
+CodeChopper is a TypeScript library that parses and splits source code of various programming languages into semantic chunks such as functions and classes, using syntax analysis. It allows efficient extraction of specific code blocks, automatic documentation generation, and code summarization when working with large codebases.
 
 > [!TIP]
 > [DeepWiki](https://deepwiki.com/sirasagi62) is available. For [detailed information about the API](https://deepwiki.com/sirasagi62/code-chopper/4-api-reference), please refer to DeepWiki.
