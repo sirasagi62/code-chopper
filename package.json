@@ -1,6 +1,6 @@
 {
   "name": "code-chopper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A library for semantically dividing code written in various programming languages",
   "keywords": [
     "Typescript"
@@ -17,7 +17,7 @@
   "author": "OKABE Gota",
   "type": "module",
   "main": "./dist/index.js",
-  "types":"./dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "test",
     "build": "tsup src/index.ts --format cjs,esm --dts",
