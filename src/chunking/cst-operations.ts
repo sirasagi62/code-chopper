@@ -91,6 +91,8 @@ const createCSTOperations = (factory: ParserFactory) => {
       content: boundary.text,
       startOffset: boundary.startIndex,
       endOffset: boundary.endIndex,
+      // Because the actual value is inserted using the I/O functions defined in io/file-operations.ts, the result is an empty string.
+      filePath: "",
       boundary: {
         type: boundary.type,
         name: boundary.name,
@@ -155,7 +157,6 @@ export const createCSTChunkingOperations = () => {
     try {
       return await chunkWithCST(code, language, options, factory);
     } catch (error) {
-      console.warn(`CST parsing failed for ${filePath}, using fallback`);
       return fallback(code, language, options);
     } finally {
       factory.dispose();

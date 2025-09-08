@@ -1,15 +1,39 @@
-# code-summary
+# CodeChopper
 
-To install dependencies:
+CodeChopper is a TypeScript library that parses and splits source code of various programming languages into semantic units such as functions and classes, using syntax analysis. It allows efficient extraction of specific code blocks, automatic documentation generation, and code summarization when working with large codebases.
+
+## Main Features
+
+* **Multi-language Support**: Supports parsing of various languages including TypeScript, JavaScript, Python, Ruby, Java, and C++. 
+* **Semantic Splitting**: Instead of simple line-by-line splitting, it uses tree-sitter to split the code based on the Concrete Syntax Tree (CST), identifying functions, classes, methods, and variable declarations. 
+* **Flexible Configuration**: You can customize the splitting granularity and extract only specific types of code blocks.
+
+-----
+
+## Installation
+
+You can install it using npm or bun.
 
 ```bash
-bun install
+npm install code-chopper
+# or
+bun add code-chopper
 ```
 
-To run:
+-----
 
-```bash
-bun run index.ts
-```
 
-This project was created using `bun init` in bun v1.2.21. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+### Examples
+
+For more advanced usage and examples, please see the following repository:
+
+* **[sirasagi62/code-chopper-examples](https://github.com/sirasagi62/code-chopper-examples)**
+
+----
+## License
+
+This library is released under the **MIT License**. The full license text can be found in the LICENSE.md file.
+
+## Acknowledgments
+
+This project partially utilizes code from [ushironoko/gistdex](https://github.com/ushironoko/gistdex).

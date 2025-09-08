@@ -38,7 +38,7 @@ describe("file-operations", () => {
       factory.dispose();
     });
 
-    it("should throw an error for unsupported file extensions", async () => {
+    it("should return an empty array for unsupported file extensions", async () => {
       const filePath = join(tempDir, "test.txt");
       await writeFile(filePath, "This is a text file.");
 
@@ -46,9 +46,7 @@ describe("file-operations", () => {
       // Provide a filter function to satisfy the Options type
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
 
-      expect(readFileAndChunk(factory, options, tempDir, "test.txt")).rejects.toThrow(
-        "Unsupported file extension: .txt"
-      );
+      expect(await readFileAndChunk(factory, options, tempDir, "test.txt")).toBeEmpty()
 
       factory.dispose();
     });

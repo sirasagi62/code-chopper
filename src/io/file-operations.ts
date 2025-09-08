@@ -34,7 +34,8 @@ export const readFileAndChunk = async (
   if (!language) {
     // If the language is not supported, we cannot chunk the file.
     // Consider logging this or returning an empty array depending on desired behavior.
-    throw new Error(`Unsupported file extension: ${ext} for file ${relativeFilePath}`);
+    //throw new Error(`Unsupported file extension: ${ext} for file ${relativeFilePath}`);
+    return []
   }
 
   // Use parseCodeAndChunk to handle the actual parsing and chunking logic.
@@ -52,38 +53,46 @@ export const readFileAndChunk = async (
  * @param factory The ParserFactory to create parsers.
  * @param options Options for chunking.
  * @param baseDirPath The root directory path of the repository.
- * @param relativePath The current relative path within the directory being scanned. Defaults to "".
  * @returns A promise that resolves to an array of BoundaryChunk from all parsed files.
  */
 export const readDirectoryAndChunk = async (
   factory: ParserFactory,
   options: Options,
   baseDirPath: string,
+): Promise<BoundaryChunk[]> => _readDirectoryAndChunkRecursive(factory,options,baseDirPath,"")
+
+const _readDirectoryAndChunkRecursive = async (
+  factory: ParserFactory,
+  options: Options,
+  baseDirPath: string,
   relativePath: string = "",
 ): Promise<BoundaryChunk[]> => {
-  let allChunks: BoundaryChunk[] = [];
-
   const currentPath = path.join(baseDirPath, relativePath);
   const entries = await fs.readdir(currentPath, { withFileTypes: true });
 
-  for (const entry of entries) {
+  // Convert each entry into a Promise and process them in parallel.
+  const promises = entries.map((entry) => {
     const newRelativePath = path.join(relativePath, entry.name);
+
     if (entry.isDirectory()) {
-      // Recursively call for subdirectories.
-      const dirChunks = await readDirectoryAndChunk(factory, options, baseDirPath, newRelativePath);
-      allChunks = allChunks.concat(dirChunks);
-    } else if (isSupportedLanguageExtension(entry.name)) { // Use isSupportedLanguage for broader check
+      // Return the subdirectories recursively.
+      return _readDirectoryAndChunkRecursive(factory, options, baseDirPath, newRelativePath);
+    }
+
+    if (isSupportedLanguageExtension(entry.name)) {
       try {
-        // Use readFileAndChunk to process each supported file.
-        const fileChunks = await readFileAndChunk(factory, options, baseDirPath, newRelativePath);
-        allChunks = allChunks.concat(fileChunks);
+        return readFileAndChunk(factory, options, baseDirPath, newRelativePath);
       } catch (error) {
-        // Log a warning if a file fails to chunk, but continue processing other files.
-        console.warn(`Failed to chunk file ${newRelativePath}:`, error);
+        return [] as BoundaryChunk[];
       }
     }
-  }
-  return allChunks;
+
+    // For unsupported file types, return an empty array.
+    return [] as BoundaryChunk[];
+  });
+
+  const nestedResults = await Promise.all(promises);
+  return nestedResults.flat();
 };
 
 /**

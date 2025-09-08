@@ -33,5 +33,5 @@ export type BoundaryChunk = {
   startOffset: number;
   endOffset: number;
   boundary: BoundaryInfo;
-  filePath?: string;
+  filePath: string;
 };
