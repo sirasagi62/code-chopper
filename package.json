@@ -3,7 +3,16 @@
   "version": "0.1.2",
   "description": "A library for semantically dividing code written in various programming languages",
   "keywords": [
-    "Typescript"
+    "Typescript",
+    "typescript",
+    "code-chopper",
+    "code",
+    "rag",
+    "chopper",
+    "split",
+    "chunking",
+    "text-splitting",
+    "llm"
   ],
   "homepage": "https://github.com/sirasagi62/code-chopper#readme",
   "bugs": {
