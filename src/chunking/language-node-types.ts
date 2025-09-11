@@ -37,7 +37,7 @@ export const LANGUAGE_NODE_TYPES = {
     interfaces: ["interface_declaration"],
     types: ["type_alias_declaration"],
     imports: ["import_statement"],
-    variables: ["variable_declaration", "lexical_declaration","public_field_definition"],
+    variables: ["variable_declaration", "lexical_declaration", "public_field_definition"],
   },
   python: {
     functions: ["function_definition"],
@@ -201,7 +201,7 @@ export const createNodeNameExtractor = (language: string) => {
         while (target.children.length > 0) {
           const nameCandidate = target.children.filter(c => c.type === "identifier")
           if (nameCandidate.length < 1) {
-            if(target.firstChild) {
+            if (target.firstChild) {
               target = target.firstChild
             } else {
               break
@@ -270,12 +270,24 @@ export const createDocsExtracor = (language: LanguageEnum) => {
       case "bash":
         break;
     }
-    if (doc_candidate && doc_candidate.type.includes("comment")) {
+    let doc_candidate_start = doc_candidate
+    let comment_text = ""
+    while (
+      doc_candidate_start?.previousSibling?.type.includes("comment") &&
+      doc_candidate_start.startPosition.row - doc_candidate_start.previousSibling.startPosition.row === 1
+    ) {
+      comment_text = doc_candidate_start.text + "\n" + comment_text
+      doc_candidate_start = doc_candidate_start.previousSibling
+    }
+    if (doc_candidate_start) {
+      comment_text = doc_candidate_start.text + "\n" + comment_text
+    }
+    if (doc_candidate && doc_candidate_start && doc_candidate.type.includes("comment")) {
       return {
         hasDocs: true,
         detail: {
-          text: doc_candidate.text,
-          startIndex: doc_candidate.startIndex,
+          text: comment_text,
+          startIndex: doc_candidate_start.startIndex,
           endIndex: doc_candidate.endIndex,
         }
       }
