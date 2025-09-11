@@ -168,6 +168,127 @@ public class HelloWorld {
 
       factory.dispose();
     });
+    it("should parse code and chunk it (c#)", async () => {
+      const code = `
+// Import: 必要な名前空間をインポートします
+using System;
+using System.Collections.Generic;
+
+// --- クラス全体がひとつのチャンク ---
+/// <summary>
+/// 商品情報を管理するクラスです。
+/// </summary>
+/// <remarks>
+/// 商品のID、名前、価格、在庫数、カテゴリを扱います。
+/// </remarks>
+public class Product
+{
+    // --- プロパティ（チャンク候補1） ---
+    /// <summary>
+    /// 商品を一意に識別するためのIDを取得または設定します。
+    /// </summary>
+    public int ProductId { get; set; }
+
+    /// <summary>
+    /// 商品名を取得または設定します。
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// 商品の価格を取得または設定します。
+    /// </summary>
+    public decimal Price { get; set; }
+
+    // --- メソッド（チャンク候補2） ---
+    /// <summary>
+    /// 商品の在庫数を増やすメソッドです。
+    /// </summary>
+    /// <param name="quantity">増やす数量。</param>
+    public void AddStock(int quantity)
+    {
+        // 在庫の増加ロジック
+        if (quantity > 0)
+        {
+            // 在庫数フィールドの更新
+        }
+    }
+
+    /// <summary>
+    /// 商品の在庫数を減らすメソッドです。
+    /// </summary>
+    /// <param name="quantity">減らす数量。</param>
+    public void DecreaseStock(int quantity)
+    {
+        // 在庫の減少ロジック
+        if (quantity > 0)
+        {
+            // 在庫数フィールドの更新
+        }
+    }
+
+    /// <summary>
+    /// 商品情報をコンソールに出力するメソッドです。
+    /// </summary>
+    public void DisplayProductInfo()
+    {
+    	int a = 10;
+        Console.WriteLine($"Product ID: {ProductId}");
+        Console.WriteLine($"Name: {Name}");
+        Console.WriteLine($"Price: {Price:C}");
+    }
+}
+
+// --- 別クラスの例 ---
+/// <summary>
+/// 注文情報を管理するクラスです。
+/// </summary>
+public class Order
+{
+    public int OrderId { get; set; }
+    public List<Product> Items { get; set; }
+    public decimal TotalPrice { get; set; }
+
+    public void CalculateTotalPrice()
+    {
+        TotalPrice = 0;
+        foreach (var item in Items)
+        {
+            TotalPrice += item.Price;
+        }
+    }
+}
+
+/// <summary>
+/// 記事投稿者用のQiitaPostインターフェイス
+/// </summary>
+interface IAuthorQiitaPost
+{
+    /// <summary>
+    /// LGTM数を取得する
+    /// </summary>
+    int LGTMCount { get; }
+    /// <summary>
+    /// ストック数を取得する
+    /// </summary>
+    int StockCount { get; }
+    /// <summary>
+    /// 記事を削除する
+    /// </summary>
+    void Delete();
+}
+      `;
+      const language = "csharp";
+      const factory = createParserFactory();
+      const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
+      const chunks = await parseCodeAndChunk(code, language, factory, options);
+      console.log("Chunk:\n", JSON.stringify(chunks))
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.some(chunk => chunk.content.includes("public class Order"))).toBe(true);
+      expect(chunks.some(chunk => chunk.content.includes("interface IAuthorQiitaPost"))).toBe(true);
+
+      factory.dispose();
+    });
+
 
     it("should parse code and chunk it (ruby)", async () => {
       const code = `

@@ -35,6 +35,8 @@ const createLanguageLoader =
             return (await import("tree-sitter-rust")).default;
           case "java":
             return (await import("tree-sitter-java")).default;
+          case "csharp":
+            return (await import("tree-sitter-c-sharp")).default
           case "ruby":
             return (await import("tree-sitter-ruby")).default;
           case "c":

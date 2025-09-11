@@ -72,6 +72,13 @@ export const LANGUAGE_NODE_TYPES = {
     imports: ["import_declaration"],
     variables: ["local_variable_declaration"],
   },
+  csharp: {
+    functions: ["method_declaration"],
+    classes: ["class_declaration"],
+    interfaces: ["interface_declaration"],
+    imports: ["using_directive"],
+    variables: ["local_variable_declaration"],
+  },
   ruby: {
     functions: ["method"],
     classes: ["class"],
@@ -216,6 +223,7 @@ export const createNodeNameExtractor = (language: string) => {
         break;
 
       case "java":
+      case "csharp":
         // For Java's method_declaration
         if (node.type === "method_declaration") {
           const nameNode = node.childForFieldName("name");
@@ -308,6 +316,7 @@ export const createDocsExtracor = (language: LanguageEnum) => {
       case "c":
       case "cpp":
       case "go":
+      case "csharp":
         return extractOuterDocComment(node)
       case "python":
         return extractPyDocComment(node)

@@ -11,6 +11,7 @@
         "tree-sitter": "^0.22.4",
         "tree-sitter-bash": "^0.23.3",
         "tree-sitter-c": "^0.23.6",
+        "tree-sitter-c-sharp": "^0.23.1",
         "tree-sitter-cpp": "^0.23.4",
         "tree-sitter-css": "^0.23.2",
         "tree-sitter-go": "^0.23.4",
@@ -32,6 +33,20 @@
       },
     },
   },
+  "trustedDependencies": [
+    "tree-sitter-java",
+    "tree-sitter-javascript",
+    "tree-sitter-ruby",
+    "tree-sitter-rust",
+    "tree-sitter-css",
+    "tree-sitter-c-sharp",
+    "tree-sitter-c",
+    "tree-sitter-python",
+    "tree-sitter-cpp",
+    "tree-sitter-go",
+    "tree-sitter-html",
+    "tree-sitter-bash",
+  ],
   "packages": {
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
@@ -316,6 +331,8 @@
     "tree-sitter-bash": ["tree-sitter-bash@0.23.3", "", { "dependencies": { "node-addon-api": "^8.2.1", "node-gyp-build": "^4.8.2" }, "peerDependencies": { "tree-sitter": "^0.21.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-36cg/GQ2YmIbeiBeqeuh4fBJ6i4kgVouDaqTxqih5ysPag+zHufyIaxMOFeM8CeplwAK/Luj1o5XHqgdAfoCZg=="],
 
     "tree-sitter-c": ["tree-sitter-c@0.23.6", "", { "dependencies": { "node-addon-api": "^8.3.0", "node-gyp-build": "^4.8.4" }, "peerDependencies": { "tree-sitter": "^0.22.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-0dxXKznVyUA0s6PjNolJNs2yF87O5aL538A/eR6njA5oqX3C3vH4vnx3QdOKwuUdpKEcFdHuiDpRKLLCA/tjvQ=="],
+
+    "tree-sitter-c-sharp": ["tree-sitter-c-sharp@0.23.1", "", { "dependencies": { "node-addon-api": "^8.2.2", "node-gyp-build": "^4.8.2" }, "peerDependencies": { "tree-sitter": "^0.21.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-9zZ4FlcTRWWfRf6f4PgGhG8saPls6qOOt75tDfX7un9vQZJmARjPrAC6yBNCX2T/VKcCjIDbgq0evFaB3iGhQw=="],
 
     "tree-sitter-cpp": ["tree-sitter-cpp@0.23.4", "", { "dependencies": { "node-addon-api": "^8.2.1", "node-gyp-build": "^4.8.2", "tree-sitter-c": "^0.23.1" }, "peerDependencies": { "tree-sitter": "^0.21.1" }, "optionalPeers": ["tree-sitter"] }, "sha512-qR5qUDyhZ5jJ6V8/umiBxokRbe89bCGmcq/dk94wI4kN86qfdV8k0GHIUEKaqWgcu42wKal5E97LKpLeVW8sKw=="],
 
