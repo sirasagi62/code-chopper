@@ -25,7 +25,7 @@ export interface CSTBoundary {
 export type CSTBoundaryWithMeta = {
   type: string;
   parentInfo: string[];
-  name: string|undefined;
+  name: string | undefined;
   docsText: string
 } & CSTBoundary
 
@@ -83,7 +83,7 @@ const createCSTOperations = (factory: ParserFactory) => {
 
     const traverser = createNodeTraverser(language);
     const tree = parser.parse(code);
-    return traverser.traverse(tree.rootNode, options.filter);
+    return traverser.traverse(tree.rootNode, options.filter ?? (() => true));
   };
 
   const boundariesToChunks = (boundaries: CSTBoundaryWithMeta[]): BoundaryChunk[] => {

@@ -8,7 +8,7 @@ import type { SyntaxNode } from "tree-sitter";
 import type { LanguageEnum } from "../chunking/language-node-types.ts";
 
 export type Options = {
-  filter: (language: LanguageEnum, node: SyntaxNode) => boolean
+  filter?: (language: LanguageEnum, node: SyntaxNode) => boolean
   excludeDirs?: RegExp[]
 }
 

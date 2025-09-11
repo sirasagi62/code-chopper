@@ -34,6 +34,7 @@ export const SUPPORTED_LANGUAGES = [
   "html",
   "css",
   "bash",
+  "csharp"
 ] as const;
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
@@ -62,6 +63,7 @@ export const TEXT_EXTENSIONS = new Set<FileExtension>([
   ".go", // Go
   ".rs", // Rust
   ".java", // Java
+  ".cs", // C#
   ".rb", // Ruby
   ".c", // C
   ".cpp", // C++
@@ -120,6 +122,8 @@ export const LANGUAGE_PARSERS = new Map<FileExtension, SupportedLanguage>([
   [".c", "c"],
   [".cpp", "cpp"],
   [".h", "c"],
+  // C#
+  [".cs","csharp"],
   // Web
   [".html", "html"],
   [".css", "css"],

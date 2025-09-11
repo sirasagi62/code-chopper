@@ -3,7 +3,7 @@
 CodeChopper is a TypeScript library that parses and splits source code of various programming languages into semantic chunks such as functions and classes, using syntax analysis. It allows efficient extraction of specific code blocks, automatic documentation generation, and code summarization when working with large codebases.
 
 > [!TIP]
-> [DeepWiki](https://deepwiki.com/sirasagi62) is available. For [detailed information about the API](https://deepwiki.com/sirasagi62/code-chopper/4-api-reference), please refer to DeepWiki.
+> [DeepWiki](https://deepwiki.com/sirasagi62/code-chopper) is available.
 >
 > [llms-full.md](/llms-full.md) is also available. You can provide an overview of code-chopper to the AI coding tool using the following URL:
 >
@@ -137,7 +137,7 @@ Returns a `Promise` that resolves to an array of `BoundaryChunk`.
 
 Configuration options for chunking.
 
-*   `filter`: A function `(language: LanguageEnum, node: SyntaxNode) => boolean` that determines whether a node should be included in the chunks.
+*   `filter`: An optional function `(language: LanguageEnum, node: SyntaxNode) => boolean` that determines whether a node should be included in the chunks. (Default value: `()=>true`)
 *   `excludeDirs?`: An optional RegExp array of regular expressions to exclude directories. e.g. `[/node_modules/,/\.git/]`
 
 ### `BoundaryInfo`
