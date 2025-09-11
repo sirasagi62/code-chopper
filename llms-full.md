@@ -25,6 +25,7 @@ CodeChopper is a TypeScript library that parses and splits source code of variou
 - rust
 - golang
 - java
+- c#
 - bash
 
 -----
