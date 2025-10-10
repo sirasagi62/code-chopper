@@ -30,7 +30,7 @@
   "scripts": {
     "test": "test",
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "parepare": "npm run build"
+    "prepare": "npm run build"
   },
   "dependencies": {
     "bun-types": "^1.2.21",

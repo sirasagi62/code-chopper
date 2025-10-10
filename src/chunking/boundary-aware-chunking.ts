@@ -1,10 +1,10 @@
 /*!
- * Copyright (c) ushirononeko 2025
+ * Copyright (c) ushironoko 2025
  * Copyright (c) sirasagi62 2025
  * Published under MIT License
  * see https://opensource.org/licenses/MIT
  *
- * This code was originally created by ushirononeko and modified by sirasagi62
+ * This code was originally created by ushironoko and modified by sirasagi62
  * Original: https://github.com/ushironoko/gistdex
  */
 
