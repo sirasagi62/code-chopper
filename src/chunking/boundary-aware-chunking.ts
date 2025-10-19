@@ -28,10 +28,17 @@ export type BoundaryInfo = {
   title?: string;
 };
 
+export type Point = {
+  row: number;
+  column: number;
+}
+
 export type BoundaryChunk = {
   content: string;
   startOffset: number;
   endOffset: number;
+  start: Point;
+  end: Point;
   boundary: BoundaryInfo;
   filePath: string;
 };

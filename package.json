@@ -30,7 +30,8 @@
   "scripts": {
     "test": "test",
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "bun-types": "^1.2.21",

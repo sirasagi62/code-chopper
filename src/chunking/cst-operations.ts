@@ -13,7 +13,7 @@ import path from "node:path";
 import type { SyntaxNode } from "tree-sitter";
 import type {
   BoundaryChunk,
-  BoundaryChunkOptions,
+  Point,
 } from "./boundary-aware-chunking.ts";
 import { getLanguageFromExtension } from "./file-extensions.ts";
 import {
@@ -30,6 +30,8 @@ import type { Options } from "../io/file-operations.ts";
 export interface CSTBoundary {
   startIndex: number;
   endIndex: number;
+  start: Point;
+  end: Point;
   text: string;
 }
 
@@ -62,6 +64,8 @@ const createNodeTraverser = (language: LanguageEnum) => {
           name,
           startIndex: docs.hasDocs ? docs.detail.startIndex : node.startIndex,
           endIndex: node.endIndex,
+          start: node.startPosition,
+          end: node.endPosition,
           text: node.text,
           docsText: docs.hasDocs ? docs.detail.text : ""
         });
@@ -102,6 +106,8 @@ const createCSTOperations = (factory: ParserFactory) => {
       content: boundary.text,
       startOffset: boundary.startIndex,
       endOffset: boundary.endIndex,
+      start: boundary.start,
+      end: boundary.end,
       // Because the actual value is inserted using the I/O functions defined in io/file-operations.ts, the result is an empty string.
       filePath: "",
       boundary: {

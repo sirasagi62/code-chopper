@@ -287,6 +287,8 @@ export const createDocsExtracor = (language: LanguageEnum) => {
         hasDocs: true,
         detail: {
           text: comment_text,
+          start: doc_candidate_start.startPosition,
+          end: doc_candidate.endPosition,
           startIndex: doc_candidate_start.startIndex,
           endIndex: doc_candidate.endIndex,
         }
@@ -310,6 +312,8 @@ export const createDocsExtracor = (language: LanguageEnum) => {
           text: doc_candidate.text,
           startIndex: doc_candidate.startIndex,
           endIndex: doc_candidate.endIndex,
+          start: doc_candidate.startPosition,
+          end: doc_candidate.endPosition,
         }
       }
     }
