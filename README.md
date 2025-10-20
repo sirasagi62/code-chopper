@@ -43,7 +43,7 @@ npm install code-chopper
 bun add code-chopper
 ```
 
-**You need to execute postinstall script to install tree-sitter dependencies.**
+**You might need to execute postinstall script to install tree-sitter dependencies.**
 
 ```bash
 ## Check postinstalls
