@@ -34,6 +34,7 @@ describe("file-operations", () => {
 
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("function greet"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "javascript")).toBe(true);
 
       factory.dispose();
     });
@@ -72,7 +73,7 @@ describe("file-operations", () => {
       // Provide a filter function to satisfy the Options type
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("function greet"))).toBe(true);
 
@@ -102,9 +103,10 @@ def add(a: int, b: int) -> int:
       // Provide a filter function to satisfy the Options type
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("def add"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "python")).toBe(true);
 
       factory.dispose();
     });
@@ -123,9 +125,10 @@ func main() {
       const factory = createParserFactory();
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("func main"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "go")).toBe(true);
 
       factory.dispose();
     });
@@ -143,9 +146,10 @@ int main() {
       const factory = createParserFactory();
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("int main"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "cpp")).toBe(true);
 
       factory.dispose();
     });
@@ -162,9 +166,10 @@ public class HelloWorld {
       const factory = createParserFactory();
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("public class HelloWorld"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "java")).toBe(true);
 
       factory.dispose();
     });
@@ -281,10 +286,11 @@ interface IAuthorQiitaPost
       const factory = createParserFactory();
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("public class Order"))).toBe(true);
       expect(chunks.some(chunk => chunk.content.includes("interface IAuthorQiitaPost"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "csharp")).toBe(true);
 
       factory.dispose();
     });
@@ -301,9 +307,10 @@ greet
       const factory = createParserFactory();
       const options = { maxChunkSize: 100, overlap: 10, filter: () => true };
       const chunks = await parseCodeAndChunk(code, language, factory, options);
-      console.log("Chunk:\n", JSON.stringify(chunks))
+      // console.log("Chunk:\n", JSON.stringify(chunks))
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.some(chunk => chunk.content.includes("def greet"))).toBe(true);
+      expect(chunks.every(chunk => chunk.language === "ruby")).toBe(true);
 
       factory.dispose();
     });
@@ -329,7 +336,7 @@ def hi():
       const chunks = await readDirectoryAndChunk(factory, options, tempDir);
 
       expect(chunks.length).toBeGreaterThan(0);
-      console.log(JSON.stringify(chunks))
+      // console.log(JSON.stringify(chunks))
       expect(chunks.filter(chunk => chunk.boundary.type === "function_declaration").length).toBe(1); // For file1.js
       expect(chunks.filter(chunk => chunk.boundary.type === "lexical_declaration").length).toBe(1); // For file2.ts
       expect(chunks.filter(chunk => chunk.boundary.type === "function_definition").length).toBe(1); // For file4.py

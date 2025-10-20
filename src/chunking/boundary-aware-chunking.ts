@@ -28,6 +28,8 @@ export type BoundaryInfo = {
   title?: string;
 };
 
+import type { LanguageEnum } from "./language-node-types.js";
+
 export type Point = {
   row: number;
   column: number;
@@ -41,4 +43,5 @@ export type BoundaryChunk = {
   end: Point;
   boundary: BoundaryInfo;
   filePath: string;
+  language: LanguageEnum;
 };

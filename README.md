@@ -166,6 +166,7 @@ Represents a chunk of code with associated boundary information.
 *   `end`: The ending position of the chunk within the original file (`Point`).
 *   `boundary`: An object of type `BoundaryInfo` describing the code boundary.
 *   `filePath`: The path to the file from which the chunk was extracted.
+*   `language`: The programming language of the chunk (`LanguageEnum`).
 
 ### `Point`
 

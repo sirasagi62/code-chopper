@@ -101,7 +101,7 @@ const createCSTOperations = (factory: ParserFactory) => {
     return traverser.traverse(tree.rootNode, options.filter ?? (() => true));
   };
 
-  const boundariesToChunks = (boundaries: CSTBoundaryWithMeta[]): BoundaryChunk[] => {
+  const boundariesToChunks = (boundaries: CSTBoundaryWithMeta[], language: LanguageEnum): BoundaryChunk[] => {
     return boundaries.map((boundary) => ({
       content: boundary.text,
       startOffset: boundary.startIndex,
@@ -116,6 +116,7 @@ const createCSTOperations = (factory: ParserFactory) => {
         parent: boundary.parentInfo,
         docs: boundary.docsText
       },
+      language,
     }));
   };
 
@@ -148,7 +149,7 @@ export const createCSTChunkingOperations = () => {
   ): Promise<BoundaryChunk[]> => {
     return withCSTParsing(factory, async (ops) => {
       const boundaries = await ops.parseAndExtractBoundaries(code, language, _options);
-      return ops.boundariesToChunks(boundaries);
+      return ops.boundariesToChunks(boundaries, language);
     });
   };
 
@@ -182,3 +183,5 @@ export const createCSTChunkingOperations = () => {
 
   return { chunkWithCST, chunkWithFallback };
 };
+
+// Update inner usage
