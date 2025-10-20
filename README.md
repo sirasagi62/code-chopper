@@ -3,9 +3,6 @@
 <h1>CodeChopper</h1>
 </div>
 
-
-
-
 CodeChopper is a TypeScript library that parses and splits source code of various programming languages into semantic chunks such as functions and classes, using syntax analysis. It allows efficient extraction of specific code blocks, automatic documentation generation, and code summarization when working with large codebases.
 
 > [!TIP]
@@ -165,8 +162,17 @@ Represents a chunk of code with associated boundary information.
 *   `content`: The code content of the chunk.
 *   `startOffset`: The starting character offset of the chunk within the original file.
 *   `endOffset`: The ending character offset of the chunk within the original file.
+*   `start`: The starting position of the chunk within the original file (`Point`).
+*   `end`: The ending position of the chunk within the original file (`Point`).
 *   `boundary`: An object of type `BoundaryInfo` describing the code boundary.
 *   `filePath`: The path to the file from which the chunk was extracted.
+
+### `Point`
+
+Represents a position in a code file using rows and columns, compatible with Tree-sitter's Point.
+
+*   `column`: The column of the position.
+*   `row`: The row of the position.
 
 ### `LanguageEnum`
 
