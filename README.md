@@ -1,6 +1,6 @@
 <div align="center">
-![CodeChopper Logo](./assets/logo.png)
-# CodeChopper
+<img src="assets/logo.png" alt="CodeChopper Logo"/>
+<h1>CodeChopper</h1>
 </div>
 
 
