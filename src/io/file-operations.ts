@@ -114,3 +114,25 @@ export const parseCodeAndChunk = (
   // The chunkWithCST method is expected to handle the language string and parser creation.
   return cstOperations.chunkWithCST(code, language, options, factory);
 };
+
+export const parseCodeWithFilePath = async (
+  code: string,
+  filePath: string,
+  factory: ParserFactory,
+  options: Options,
+
+): Promise<BoundaryChunk[]> => {
+  const ext = path.extname(filePath);
+  const language = getLanguageFromExtension(ext);
+
+  if (!language) {
+    return []
+  }
+
+  const chunks = await parseCodeAndChunk(code, language, factory, options);
+  return chunks.map(c => ({
+    ...c,
+    filePath: filePath
+  }));
+};
+
