@@ -6,10 +6,12 @@ import type { BoundaryChunk } from "../chunking/boundary-aware-chunking.ts";
 import { createCSTChunkingOperations } from "../chunking/cst-operations.ts";
 import type { SyntaxNode } from "tree-sitter";
 import type { LanguageEnum } from "../chunking/language-node-types.ts";
+import pLimit, { type LimitFunction } from "p-limit";
 
 export type Options = {
   filter?: (language: LanguageEnum, node: SyntaxNode) => boolean
   excludeDirs?: RegExp[]
+  concurrency?: number
 }
 
 const isSupportedLanguageExtension = (filename: string) => /\.(ts|js|tsx|jsx|py|java|cpp|c|h|cs|go|rb|php|go)/.test(filename)
@@ -59,12 +61,16 @@ export const readDirectoryAndChunk = async (
   factory: ParserFactory,
   options: Options,
   baseDirPath: string,
-): Promise<BoundaryChunk[]> => _readDirectoryAndChunkRecursive(factory, options, baseDirPath, "")
+): Promise<BoundaryChunk[]> => {
+  const limit = pLimit(options.concurrency ?? 100)
+  return _readDirectoryAndChunkRecursive(factory, options, baseDirPath, limit, "")
+}
 
 const _readDirectoryAndChunkRecursive = async (
   factory: ParserFactory,
   options: Options,
   baseDirPath: string,
+  limit: LimitFunction,
   relativePath: string = "",
 ): Promise<BoundaryChunk[]> => {
   const currentPath = path.join(baseDirPath, relativePath);
@@ -77,7 +83,7 @@ const _readDirectoryAndChunkRecursive = async (
     // Check if entry is not excluded directories
     if (entry.isDirectory() && excludeDirs.every(e => !e.test(entry.name))) {
       // Return the subdirectories recursively.
-      return _readDirectoryAndChunkRecursive(factory, options, baseDirPath, newRelativePath);
+      return limit(() => _readDirectoryAndChunkRecursive(factory, options, baseDirPath, limit, newRelativePath));
     }
 
     if (entry.isFile() && isSupportedLanguageExtension(entry.name)) {
