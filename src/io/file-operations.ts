@@ -75,17 +75,13 @@ const _readDirectoryAndChunkRecursive = async (
   const promises = entries.map((entry) => {
     const newRelativePath = path.join(relativePath, entry.name);
     // Check if entry is not excluded directories
-    if (entry.isDirectory() && excludeDirs.every(e=>!e.test(entry.name))) {
+    if (entry.isDirectory() && excludeDirs.every(e => !e.test(entry.name))) {
       // Return the subdirectories recursively.
       return _readDirectoryAndChunkRecursive(factory, options, baseDirPath, newRelativePath);
     }
 
-    if (isSupportedLanguageExtension(entry.name)) {
-      try {
-        return readFileAndChunk(factory, options, baseDirPath, newRelativePath);
-      } catch (error) {
-        return [] as BoundaryChunk[];
-      }
+    if (entry.isFile() && isSupportedLanguageExtension(entry.name)) {
+      return readFileAndChunk(factory, options, baseDirPath, newRelativePath).catch(() => [] as BoundaryChunk[]);
     }
 
     // For unsupported file types, return an empty array.
